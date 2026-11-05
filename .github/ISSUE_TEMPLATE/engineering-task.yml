@@ -1,0 +1,41 @@
+name: Engineering task
+description: Engineering work. Also appears on that project's Backlog Gantt chart.
+body:
+  - type: dropdown
+    id: project
+    attributes:
+      label: Project
+      description: Which project is this for? It decides which Backlog Gantt the task goes to.
+      # Keep this list the same as the names in .github/backlog-projects.json
+      options:
+        - project-a
+        - project-b
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Parent issue
+      description: "Optional. Leave empty to use the project's default group. Write none to make this a parent (top level). Write a GitHub number (#18) or Backlog key (ABC-14) to make this its child."
+      placeholder: "#18"
+  - type: input
+    id: start
+    attributes:
+      label: Start date
+      description: "Format: YYYY-MM-DD"
+      placeholder: "2026-11-02"
+    validations:
+      required: true
+  - type: input
+    id: due
+    attributes:
+      label: Due date
+      description: "Format: YYYY-MM-DD"
+      placeholder: "2026-11-06"
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What needs to be done

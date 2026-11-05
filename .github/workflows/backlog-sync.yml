@@ -1,0 +1,48 @@
+# GitHub Issues + pushes  ->  Backlog (one repo, many Backlog projects)
+# Projects and their Backlog keys: .github/backlog-projects.json
+# Secrets (Settings -> Secrets and variables -> Actions):
+#   BACKLOG_API_KEY  required  Backlog API key
+#   PROJECT_TOKEN    optional  classic GitHub token ("repo" + "project" scopes) for the Projects board
+
+name: Sync to Backlog
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled, assigned, edited, closed, reopened]
+  push:
+  workflow_dispatch:   # "Run workflow" button
+    inputs:
+      mode:
+        description: "import = copy Backlog engineering issues into GitHub · setup-board = create/fill the Projects board"
+        type: choice
+        options: [import, setup-board]
+        default: import
+
+permissions:
+  contents: read
+  issues: write
+
+# One run at a time per issue, so "opened" and "labeled" never both create a Backlog issue
+concurrency:
+  group: backlog-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    # Does nothing in the template itself; runs in every repo made from it
+    if: github.repository != 'Thao-XC/backlog-gantt-sync-template'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/github-script@v7
+        env:
+          BACKLOG_HOST: your-space.backlog.jp  # <- change to your Backlog address
+          BACKLOG_ISSUE_TYPE: Task              # Backlog issue type for new issues
+          BACKLOG_API_KEY: ${{ secrets.BACKLOG_API_KEY }}
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+          BOARD_TITLE: Backlog Gantt board      # name of the GitHub Projects board
+        with:
+          script: |
+            const sync = require('./.github/scripts/backlog-sync.js');
+            await sync({ github, context, core, getOctokit: typeof getOctokit === 'function' ? getOctokit : undefined });
