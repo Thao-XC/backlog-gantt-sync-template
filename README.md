@@ -10,7 +10,8 @@ sales items (NDAs, quotes, contracts).
 
 - An **Engineering task** issue form: Project, Parent issue, Start date, Due date
 - New GitHub issues become Backlog issues with dates, in the right project, as parent or child
-- Four statuses from GitHub labels: no label = Open, `in-progress`, `resolved`, closed = Closed
+- Four statuses from GitHub labels: no label = Open, `backlog:in-progress`, `backlog:resolved`, closed = Closed
+- Every label it uses starts with `backlog:`, so it never clashes with labels your repo already has
 - Commits mentioning `#21` are posted to Backlog; merging a PR with `Fixes #21` closes it
 - Optional GitHub Projects board (Todo / In Progress / Resolved / Done + Roadmap)
 
@@ -35,7 +36,7 @@ sales items (NDAs, quotes, contracts).
    }
    ```
 
-   - name (`project-a`): what engineers pick in the form; also a GitHub label
+   - name (`project-a`): what engineers pick in the form; the GitHub label is `backlog:project-a`
    - `projectKey`: the Backlog project key (shown next to the project name in Backlog)
    - `parentKey`: optional Backlog issue that groups engineering work (`""` = none)
 
@@ -60,7 +61,8 @@ Don't use the template button. Copy these 5 files into the same paths in your re
 ```
 
 - Existing issues, commits and pull requests are **not** sent to Backlog. An old issue goes to
-  Backlog only if someone adds a project label (e.g. `project-a`) to it.
+  Backlog only if someone adds its `backlog:` project label (e.g. `backlog:project-a`). A plain
+  `project-a` label the repo already uses does nothing.
 - Other issue forms keep working. The bot comments only on issues made with the
   **Engineering task** form, so bug reports and other issues stay quiet.
 - Each run downloads only the `.github` folder, so a large codebase doesn't slow it down.
@@ -69,13 +71,28 @@ Don't use the template button. Copy these 5 files into the same paths in your re
 - Organization repo: **Settings → Actions → General** must allow GitHub's own actions
   (`actions/checkout`, `actions/github-script`).
 
+### Bring existing open issues onto the Gantt (bring-in)
+
+**Actions** → **Sync to Backlog** → **Run workflow** → mode `bring-in`:
+
+| Box | Example | Meaning |
+| --- | --- | --- |
+| project | `project-a` | Which Backlog project (a name from `backlog-projects.json`) |
+| select | `milestone:Sprint 5` or `label:release-2` | Which **open** issues to bring in |
+| confirm | empty, then `APPLY` | Empty = dry run: the run log lists what would happen. `APPLY` = do it |
+
+Each matching issue gets a Backlog issue, `[KEY-n]` in its title, the `backlog:` project label and a
+link comment. Dates: the issue's form dates if it has them; otherwise **due = the milestone's due
+date** and **start = the day the issue was opened**. Without a milestone it has no dates (set them in
+Backlog). Pull requests and already-linked issues are skipped, so running it twice is safe.
+
 ## Daily use
 
 | On the GitHub issue | Backlog |
 | --- | --- |
 | Create with the **Engineering task** form | New issue with dates, in the chosen project |
-| Label `in-progress` (or assign someone, or push a commit with `#n`) | In Progress |
-| Label `resolved` | Resolved (done, waiting for a check) |
+| Label `backlog:in-progress` (or assign someone, or push a commit with `#n`) | In Progress |
+| Label `backlog:resolved` | Resolved (done, waiting for a check) |
 | Close the issue, or merge a PR with `Fixes #n` | Closed |
 | Remove the label / reopen | Back to Open / In Progress |
 | Edit title, dates, **Parent issue** | Updated; the Gantt bar moves |
@@ -110,7 +127,7 @@ The board follows the labels. Change status with labels, not by dragging cards.
 | Problem | Fix |
 | --- | --- |
 | Red ❌ in **Actions** | Check `BACKLOG_API_KEY`, and that its owner is a member of that Backlog project |
-| Bot: "no project chosen" | Add the project label (e.g. `project-a`) to the issue |
+| Bot: "no project chosen" | Add the project label (e.g. `backlog:project-a`) to the issue |
 | Bot: parent problem | Edit the **Parent issue** line (one level, same project) |
 | Label has no effect | Put it on the **issue**, not the pull request |
 | No bar on the Gantt | Add both dates, or move the Gantt's Start Date earlier |

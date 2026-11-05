@@ -1,5 +1,5 @@
 {
-  "_help": "One line per project. The name (e.g. project-a) is what engineers pick in the issue form's Project dropdown, or add as a GitHub label. projectKey = the Backlog project key. parentKey = optional Backlog issue that groups the engineering work (empty = none; Run workflow then skips this project, so sales issues are never copied to GitHub). Keep the names the same as the Project list in .github/ISSUE_TEMPLATE/engineering-task.yml.",
+  "_help": "One line per project. The name (e.g. project-a) is what engineers pick in the issue form's Project dropdown; its GitHub label is backlog:project-a. projectKey = the Backlog project key. parentKey = optional Backlog issue that groups the engineering work (empty = none; Run workflow then skips this project, so sales issues are never copied to GitHub). Keep the names the same as the Project list in .github/ISSUE_TEMPLATE/engineering-task.yml.",
   "projects": {
     "project-a": { "projectKey": "ABC", "parentKey": "ABC-2" },
     "project-b": { "projectKey": "XYZ", "parentKey": "" }
