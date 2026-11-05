@@ -46,6 +46,29 @@ sales items (NDAs, quotes, contracts).
    → **Run workflow** → mode `import` (copies children of `parentKey`; projects with no
    `parentKey` are skipped so sales items stay in Backlog).
 
+## Already have a repo with code and engineers?
+
+Don't use the template button. Copy these 5 files into the same paths in your repo
+(through a pull request if `main` is protected), then do steps 2–6 above:
+
+```
+.github/workflows/backlog-sync.yml
+.github/scripts/backlog-sync.js
+.github/scripts/board.js
+.github/backlog-projects.json
+.github/ISSUE_TEMPLATE/engineering-task.yml
+```
+
+- Existing issues, commits and pull requests are **not** sent to Backlog. An old issue goes to
+  Backlog only if someone adds a project label (e.g. `project-a`) to it.
+- Other issue forms keep working. The bot comments only on issues made with the
+  **Engineering task** form, so bug reports and other issues stay quiet.
+- Each run downloads only the `.github` folder, so a large codebase doesn't slow it down.
+- Many pushes? In `backlog-sync.yml`, uncomment `branches: [main, develop]` under `push:` to
+  check only those branches (saves Actions minutes on a private repo).
+- Organization repo: **Settings → Actions → General** must allow GitHub's own actions
+  (`actions/checkout`, `actions/github-script`).
+
 ## Daily use
 
 | On the GitHub issue | Backlog |
